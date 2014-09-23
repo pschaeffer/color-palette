@@ -1139,17 +1139,36 @@ public final class ColorPalette {
    * the colors. Colors are then pulled from the pool and returned
    * to the pool, as need be. The two hash maps are never modified
    * after they are built in this constructor.
+   * 
+   * @exception  IllegalArgumentException if a duplicate color is 
+   *             detected
+   * @exception  IllegalArgumentException if a duplicate RGB value  
+   *             is detected
    */  
   public ColorPalette() {     
     /* Build the items tree map */
     for(int i = 0; i < items.length; i++)
       itemsTree.add(i);
-    /* Build the color name to color index mapping */
-    for(int i = 0; i < items.length; i++)
+    /* Build the color name to color index mapping. Note that duplicate
+     * color names are not allowed and should not occur. 
+     */
+    for(int i = 0; i < items.length; i++) {
+      if (itemsByName.containsKey(items[i].name)) {
+        throw new IllegalArgumentException("Color name already exists in pool - " +
+                                           items[i].name);        
+      }
       itemsByName.put(items[i].name, i);
-    /* Build the color RGB value to color index mapping */
-    for(int i = 0; i < items.length; i++)
+    }
+    /* Build the color RGB value to color index mapping. Note that duplicate
+     * RGB values are not allowed and should not occur.
+     */
+    for(int i = 0; i < items.length; i++) {
+      if (itemsByRgb.containsKey(items[i].rgb)) {
+        throw new IllegalArgumentException("RGB value already exists in pool - " +
+                                           String.format("0x%06x", items[i].rgb ));        
+      }
       itemsByRgb.put(items[i].rgb, i);   
+    }
   }
   /** 
    * Get the number of colors left in the color pool. The number
